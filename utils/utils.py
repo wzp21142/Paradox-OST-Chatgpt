@@ -114,7 +114,10 @@ def segmentTranslator(lang,_text,_keys,errorPath,segmentNum=0,translatedList=[])
                     translated[i]+='\n'
                 f.write(''.join(translated))
             else:
+                for i in range(len(translatedList)):
+                    translatedList[i]+='\n'
                 f.write(''.join(translatedList))
                 f.write(''.join(translated))
-        exit("Error, the half-translated file is saved to "+errorPath)
+        print("Error at segment "+str(segmentNum)+", there are "+str(len(_keys))+" keys but "+str(len(translated))+" were given. half-translated file is saved to "+errorPath)
+        return False
     return ans

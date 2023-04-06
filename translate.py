@@ -24,6 +24,7 @@ for file in tqdm.tqdm(localeFiles):
     file.content=getKey_Value(file.content)
     origin=file.content[1]
     errorPath=os.path.join(outputPath,file.filePath+"_error.yml")
+    failedFiles=[]
     # The total tokens counter is erroneous
     '''From OpenAI's documentation:
     Note that very long conversations are more likely to receive incomplete replies. 
@@ -36,23 +37,35 @@ for file in tqdm.tqdm(localeFiles):
     tokens=len(tiktoken.encoding_for_model('gpt-3.5-turbo-0301').encode(_text))
     tokensInTotal+=tokens
     if tokens<=1350:
-        file.content=segmentTranslator(lang,_text,file.content[0],errorPath)
+        translated=segmentTranslator(lang,_text,file.content[0],errorPath)
+        if not translated:
+            continue
     else:
         splitLocation=splitContents(origin)
         translated=[]
         start=0
+        flag=False
         for i in range(len(splitLocation)):
             if i==len(splitLocation)-1 and splitLocation[-1]==len(origin) and start!=0:
                 start=len(origin)-1
             else:
                 #print(len(tiktoken.encoding_for_model('gpt-3.5-turbo').encode("".join(origin[start:splitLocation[i]-1].__str__()))))
                 _text=get_text(origin[start:(splitLocation[i]-1)])
-                translated.append(segmentTranslator(lang,_text,file.content[0][start:splitLocation[i]-1],errorPath,i,translated))
+                _translated=segmentTranslator(lang,_text,file.content[0][start:splitLocation[i]-1],errorPath,i,translated)
+                if not _translated:
+                    flag=True
+                    break
+                translated+=_translated
                 start=splitLocation[i]
+        if flag:
+            failedFiles.append(file.filePath)
+            continue
         _text=get_text(origin[start:])
-        translated.append(segmentTranslator(lang,_text,file.content[0][start:],errorPath,i,translated))
-        file.content=translated
+        translated+=segmentTranslator(lang,_text,file.content[0][start:],errorPath,i,translated)
+    file.content=translated
     saveFile(language,outputPath,file)
 
-
 print("Done, total tokens used:"+str(tokensInTotal))
+print("Failed files:")
+for i in failedFiles:
+    print(i)
