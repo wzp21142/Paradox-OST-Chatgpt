@@ -57,11 +57,15 @@ for file in tqdm.tqdm(localeFiles):
                     break
                 translated+=_translated
                 start=splitLocation[i]
-        if flag:
-            failedFiles.append(file.filePath)
+        if flag :
+            failedFiles+=(file.filePath)
+            continue
+        _translated=segmentTranslator(lang,_text,file.content[0][start:],errorPath,i,translated)
+        if not _translated:
+            failedFiles+=(file.filePath)
             continue
         _text=get_text(origin[start:])
-        translated+=segmentTranslator(lang,_text,file.content[0][start:],errorPath,i,translated)
+        translated+=_translated
     file.content=translated
     saveFile(language,outputPath,file)
 

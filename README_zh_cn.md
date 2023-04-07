@@ -39,6 +39,6 @@ python translate.py -i "...\localization\english" -l simp_chinese
 3. 已知的bug： 
    
    [1] ChatGPT有时会不按格式输出，导致key-value对无法配对，报错信息会是IndexError: list index out of range。目前的解决方案是用"↑"分割每个输入ChatGPT的value而不是用默认的引号和逗号（因为value文本中本身也存在这两种字符，在处理上下文关系时ChatGPT并不能完全理解分割关系，进而翻译出错），在测试中此类问题会减少很多，但仍然偶有发生。如果出现此类情况，可能是因为出错的文件中存在"↑"字符，可以换成其他字符，对照输出路径中已经翻译好的文件，暂时删除输入路径下对应的原文本文件，从上次中断的地方重新开始翻译，如果反复测试都在同一个文件上报错，再尝试改小每次分段的大小(见1)。由于GPT回答的随机性，目前没有更好的解决方法。  
-   
-   [2] 在几行内有很多内容相似的文本时，ChatGPT会大概率遗漏掉其中的几条，导致key-value对无法匹配。这个问题在网页端是不存在的，但在API上几乎必定出现，可能仍然需要更精细的prompt设计，感兴趣的朋友可以尝试翻译V3本体的Victoria 3\game\localization\concepts_l_english.yml文件。
+
+   [2] 在几行内有很多内容相似的文本（可能只是触发条件之一）时，ChatGPT会大概率遗漏掉其中的几条，导致key-value对无法匹配。这个问题在网页端是不存在的，但在API上几乎必定出现，可能仍然需要更精细的prompt设计，感兴趣的朋友可以尝试翻译V3本体的Victoria 3\game\localization\english\concepts_l_english.yml文件，在测试中这个文件在第一个分段段翻译到第10行"Healthy"附近时就必定会出错。
 4. 目前的脚本只是初版，可能还存在其他各种问题，如果对以上任何问题有更好的建议、更好的配置方案或者发现bug，随时欢迎issue/PR！
